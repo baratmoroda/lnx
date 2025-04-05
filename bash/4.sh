@@ -5,15 +5,15 @@ declare -A planets=(
 	["Venus"]=0
 	["Earth"]=1
 	["Mars"]=2
-	["Jupiter"]=95
-	["Saturn"]=146
+	["Jupiter"]=98
+	["Saturn"]=83
 	["Uranus"]=27
 	["Neptune"]=14
 )
 
 if [ -z "${planets[$planet_name]}" ]; then
-	echo "error, '$planet_name' does not exist"
+	echo "Unknown planet"
 	exit 1
 else
-	echo "planet '$planet_name' has ${planets[$planet_name]} moons"
+	echo "${planets[$planet_name]}"
 fi
