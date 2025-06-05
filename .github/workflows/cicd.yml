@@ -85,3 +85,4 @@ jobs:
               --name app \
               -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
               ${{ secrets.DOCKERHUB_USERNAME }}/administration:latest
+          timeout: 100s
