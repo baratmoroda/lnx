@@ -1,4 +1,4 @@
-name: CI C
+name: CI CD
 on:
   push:
     branches: [ "main" ]
