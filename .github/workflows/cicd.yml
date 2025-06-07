@@ -29,55 +29,55 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/administration:latest
   test:
-  runs-on: ubuntu-latest
-  needs: [build-and-push]
-  services:
-    postgres:
-      image: postgres:alpine
-      env:
-        POSTGRES_DB: kubsu
-        POSTGRES_PASSWORD: kubsu
-        POSTGRES_USER: kubsu
-      ports:
-        - 5432:5432
-      options: >-
-        --health-cmd="pg_isready"
-        --health-interval=10s
-        --health-timeout=5s
-        --health-retries=5
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    runs-on: ubuntu-latest
+    needs: [build-and-push]
+    services:
+      postgres:
+        image: postgres:alpine
+        env:
+          POSTGRES_DB: kubsu
+          POSTGRES_PASSWORD: kubsu
+          POSTGRES_USER: kubsu
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
  
-    - name: Run all steps inside container
-      env:
-        DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/administration:latest
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      run: |
-        docker run --rm \
-          --network host \
-          -e DATABASE_URL="$DATABASE_URL" \
-          -v "$(pwd):/app" \
-          -w /app \
-          "$DOCKER_IMAGE" \
-          sh -c '
-            echo "1. Waiting for PostgreSQL..."
-            while ! nc -z localhost 5432; do sleep 1; done
+      - name: Run all steps inside container
+        env:
+          DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/administration:latest
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          docker run --rm \
+            --network host \
+            -e DATABASE_URL="$DATABASE_URL" \
+            -v "$(pwd):/app" \
+            -w /app \
+            "$DOCKER_IMAGE" \
+            sh -c '
+              echo "1. Waiting for PostgreSQL..."
+              while ! nc -z localhost 5432; do sleep 1; done
             
-            echo "2. Installing test dependencies..."
-            pip install --prefix=/install ".[test]"
+              echo "2. Installing test dependencies..."
+              pip install --prefix=/install ".[test]"
             
-            echo "3. Running tests..."
-            pytest tests
+              echo "3. Running tests..."
+              pytest tests
             
-            echo "4. Cleaning up test dependencies..."
-            pip uninstall -y $(pip freeze | grep -v "^-e" | cut -d= -f1)
-          '
+              echo "4. Cleaning up test dependencies..."
+              pip uninstall -y $(pip freeze | grep -v "^-e" | cut -d= -f1)
+            '
  
-    - name: Cleanup host system
-      run: |
-        docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/administration:latest || true
-        docker system prune -af
+      - name: Cleanup host system
+        run: |
+          docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/administration:latest || true
+          docker system prune -af
   deploy:
     runs-on: self-hosted
     needs: [ test ]
