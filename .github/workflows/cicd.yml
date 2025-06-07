@@ -70,7 +70,7 @@ jobs:
             -v $(pwd):/app \
             -w /app \
             ${{ secrets.DOCKERHUB_USERNAME }}/administration:latest \
-            sh -c "while ! nc -z localhost 5432; do sleep 1; done && pip install --prefix=/install ".[test]" && pytest tests"
+            sh -c "while ! nc -z localhost 5432; do sleep 1; done && pip install --prefix=/install .[test] && pytest tests"
  
       - name: Cleanup
         run: |
