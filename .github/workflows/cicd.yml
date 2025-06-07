@@ -62,16 +62,13 @@ jobs:
             "$DOCKER_IMAGE" \
             sh -c '
               echo "1. Waiting for PostgreSQL..."
-              while ! nc -z localhost 5432; do sleep 1; done
+              python -m pip install --upgrade pip
             
               echo "2. Installing test dependencies..."
-              pip install -e ".[test]"
+              pip install pytest pytest-asyncio httpx
             
               echo "3. Running tests..."
               pytest
-            
-              echo "4. Cleaning up test dependencies..."
-              pip freeze | grep -v "^\-e" | xargs pip uninstall -y
             '
  
       - name: Cleanup host system
