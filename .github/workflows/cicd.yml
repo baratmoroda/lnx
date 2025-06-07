@@ -62,7 +62,7 @@ jobs:
             sh -c '
               echo "Waiting for PostgreSQL..."
               while ! nc -z localhost 5432; do sleep 1; done
-              make test
+              && pip install ".[test]" && pytest tests
             '
  
       - name: Cleanup
