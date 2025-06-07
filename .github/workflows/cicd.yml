@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ build-and-push ]
     env:
-      DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/adminstration: latest
+      DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/adminstration:latest
     container:
       image: ${{ env.DOCKER_IMAGE }}
       options: --network host
