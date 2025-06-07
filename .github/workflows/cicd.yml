@@ -30,45 +30,45 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/administration:latest
  
   test:
-  runs-on: ubuntu-latest
-  needs: [build-and-push]
-  services:
-    postgres:
-      image: postgres:alpine
-      env:
-        POSTGRES_DB: kubsu
-        POSTGRES_PASSWORD: kubsu
-        POSTGRES_USER: kubsu
-      ports:
-        - 5432:5432
-      options: >-
-        --health-cmd="pg_isready"
-        --health-interval=10s
-        --health-timeout=5s
-        --health-retries=5
-  steps:
-    - uses: actions/checkout@v4
+    runs-on: ubuntu-latest
+    needs: [build-and-push]
+    services:
+      postgres:
+        image: postgres:alpine
+        env:
+          POSTGRES_DB: kubsu
+          POSTGRES_PASSWORD: kubsu
+          POSTGRES_USER: kubsu
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - uses: actions/checkout@v4
  
-    - name: Run tests inside container
-      env:
-        DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/administration:latest
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      run: |
-        docker run --rm \
-          --network host \
-          -e DATABASE_URL="$DATABASE_URL" \
-          -v "$(pwd):/app" -w /app \
-          "$DOCKER_IMAGE" \
-          sh -c '
-            echo "Waiting for PostgreSQL..."
-            while ! nc -z localhost 5432; do sleep 1; done
-            make test
-          '
+      - name: Run tests inside container
+        env:
+          DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/administration:latest
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          docker run --rm \
+            --network host \
+            -e DATABASE_URL="$DATABASE_URL" \
+            -v "$(pwd):/app" -w /app \
+            "$DOCKER_IMAGE" \
+            sh -c '
+              echo "Waiting for PostgreSQL..."
+              while ! nc -z localhost 5432; do sleep 1; done
+              make test
+            '
  
-    - name: Cleanup
-      run: |
-        docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/administration:latest || true
-        docker system prune -af
+      - name: Cleanup
+        run: |
+          docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/administration:latest || true
+          docker system prune -af
   deploy:
     runs-on: self-hosted
     needs: [ test ]
