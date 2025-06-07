@@ -61,9 +61,7 @@ jobs:
             "$DOCKER_IMAGE" \
             sh -c '
               echo "Waiting for PostgreSQL..."
-              while ! nc -z localhost 5432; do sleep 1; done
-              && pip install ".[test]" && pytest tests
-            '
+              while ! nc -z localhost 5432; do sleep 1; done && pip install --prefix=/install ".[test]" && pytest tests '
  
       - name: Cleanup
         run: |
