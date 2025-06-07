@@ -61,6 +61,9 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/administration:latest \
             sh -c "while ! nc -z localhost 5432; do sleep 1; done && pip install --prefix=/install ".[test]" && pytest tests"
       - name: Cleanup
+        run: |
+          docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/administration:latest \
+            && docker system prune -af
   deploy:
     runs-on: self-hosted
     needs: [ test ]
