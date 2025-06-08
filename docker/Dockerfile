@@ -9,5 +9,5 @@ WORKDIR /app
 COPY . .
 COPY --from=builder /install /usr/local
  
-EXPOSE 8058
+EXPOSE 8095
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8095"]
